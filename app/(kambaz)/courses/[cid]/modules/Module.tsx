@@ -1,4 +1,6 @@
+
 import type { ReactNode } from "react";
+import GreenCheckmark from "./GreenCheckmark";
 
 export default function Module({
   title,
@@ -8,9 +10,14 @@ export default function Module({
   children?: ReactNode;
 }) {
   return (
-    <li className="wd-module">
-      <div className="wd-title">{title}</div>
-      <ul className="wd-lessons">{children}</ul>
+    <li className="wd-module mb-6 list-none border border-gray-300">
+      <div className="wd-title flex items-center justify-between bg-gray-200 p-4 font-bold">
+        <span>{title}</span>
+        <GreenCheckmark />
+      </div>
+      <ul className="wd-lessons m-0 list-none p-0">
+        {children}
+      </ul>
     </li>
   );
 }

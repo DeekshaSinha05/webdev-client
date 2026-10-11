@@ -1,9 +1,11 @@
+
 import Link from "next/link";
 
 export default function Labs() {
   return (
     <div id="wd-labs">
       <h1>Labs</h1>
+      <p>Deeksha Sinha</p>
 
       <ul>
         <li>
@@ -24,12 +26,16 @@ export default function Labs() {
           <Link href="/labs/lab5">Lab 5</Link>
         </li>
         <li>
-          <Link href="/" id="wd-kambaz-link">
-  Kambaz
-</Link>
+          <Link href="/">
+            Kambaz
+          </Link>
         </li>
       </ul>
-      <a id="wd-github" href="https://github.com/DeekshaSinha05/webdev-client">
+
+      <a
+        id="wd-github"
+        href="https://github.com/DeekshaSinha05/webdev-client"
+      >
         GitHub repository
       </a>
     </div>
