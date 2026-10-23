@@ -3,42 +3,39 @@ import Link from "next/link";
 import Image from "next/image";
 
 export default function CourseCard({
-  id,
-  title,
-  subtitle,
+  _id,
+  name,
+  description,
   image,
 }: {
-  id: string;
-  title: string;
-  subtitle: string;
+  _id: string;
+  name: string;
+  description: string;
   image: string;
 }) {
   return (
-    <div className="wd-dashboard-course w-[300px] max-w-full overflow-hidden rounded-lg border border-gray-300 bg-white shadow-sm">
+    <div className="wd-dashboard-course w-[300px] max-w-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
       <Link
-        href={`/courses/${id}/home`}
-        className="wd-dashboard-course-link block text-inherit no-underline"
+        href={`/courses/${_id}/home`}
+        className="wd-dashboard-course-link block text-neutral-900 no-underline"
       >
         <Image
           src={image}
           width={300}
           height={160}
-          alt={title}
+          alt={name}
           className="h-40 w-full object-cover"
         />
-
         <div className="p-4">
-          <h5 className="mb-2 truncate text-lg font-bold text-blue-700">
-            {title}
+          <h5 className="wd-dashboard-course-title m-0 mb-2 truncate text-lg font-semibold whitespace-nowrap">
+            {name}
           </h5>
-
-          <p className="wd-dashboard-course-title mb-4 h-[100px] overflow-hidden text-sm text-gray-600">
-            {subtitle}
+          <p className="wd-dashboard-course-description m-0 mb-3 h-[100px] overflow-hidden text-sm text-neutral-600">
+            {description}
           </p>
-
           <button
             type="button"
-            className="rounded bg-blue-600 px-4 py-2 text-white"
+            className="inline-flex items-center justify-center rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white"
           >
             Go
           </button>

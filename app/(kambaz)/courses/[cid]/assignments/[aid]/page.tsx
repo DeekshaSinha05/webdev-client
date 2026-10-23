@@ -1,12 +1,16 @@
 
 import Link from "next/link";
+import * as db from "../../../../database";
 
 export default async function AssignmentEditor({
   params,
 }: {
   params: Promise<{ cid: string; aid: string }>;
 }) {
-  const { cid } = await params;
+  const { cid, aid } = await params;
+  const assignment = db.assignments.find(
+    (a) => a._id === aid && a.course === cid
+  );
 
   const inputStyle =
     "w-full rounded border border-gray-300 bg-white px-3 py-2";
@@ -20,25 +24,22 @@ export default async function AssignmentEditor({
         <label htmlFor="wd-name" className="mb-2 block font-medium">
           Assignment Name
         </label>
-
         <input
           id="wd-name"
-          defaultValue="A1 - ENV + HTML"
+          defaultValue={assignment?.title ?? ""}
           className={inputStyle}
         />
       </div>
 
+      <p className="mb-4">Assignment id: {aid}</p>
+
       <div className="mb-6">
-        <label
-          htmlFor="wd-description"
-          className="mb-2 block font-medium"
-        >
+        <label htmlFor="wd-description" className="mb-2 block font-medium">
           Description
         </label>
-
         <textarea
           id="wd-description"
-          defaultValue="The assignment is available online Submit a link to the landing page of your Web application running on Vercel."
+          defaultValue={assignment?.description ?? ""}
           className={`${inputStyle} min-h-[160px]`}
         />
       </div>
@@ -49,7 +50,7 @@ export default async function AssignmentEditor({
         </label>
         <input
           id="wd-points"
-          defaultValue={100}
+          defaultValue={assignment?.points ?? 100}
           className={inputStyle}
         />
       </div>
@@ -71,10 +72,7 @@ export default async function AssignmentEditor({
       </div>
 
       <div className={rowStyle}>
-        <label
-          htmlFor="wd-display-grade-as"
-          className={labelStyle}
-        >
+        <label htmlFor="wd-display-grade-as" className={labelStyle}>
           Display Grade as
         </label>
         <select
@@ -87,10 +85,7 @@ export default async function AssignmentEditor({
       </div>
 
       <div className={rowStyle}>
-        <label
-          htmlFor="wd-submission-type"
-          className={labelStyle}
-        >
+        <label htmlFor="wd-submission-type" className={labelStyle}>
           Submission Type
         </label>
         <select
@@ -103,50 +98,30 @@ export default async function AssignmentEditor({
       </div>
 
       <div className={rowStyle}>
-        <span className={labelStyle}>
-          Online Entry Options
-        </span>
-
+        <span className={labelStyle}>Online Entry Options</span>
         <div className="flex flex-col gap-3 rounded border border-gray-300 p-4">
           <label className="flex items-center gap-2">
-            <input
-              id="wd-text-entry"
-              type="checkbox"
-              defaultChecked
-            />
+            <input id="wd-text-entry" type="checkbox" defaultChecked />
             Text Entry
           </label>
 
           <label className="flex items-center gap-2">
-            <input
-              id="wd-website-url"
-              type="checkbox"
-              defaultChecked
-            />
+            <input id="wd-website-url" type="checkbox" defaultChecked />
             Website URL
           </label>
 
           <label className="flex items-center gap-2">
-            <input
-              id="wd-media-recordings"
-              type="checkbox"
-            />
+            <input id="wd-media-recordings" type="checkbox" />
             Media Recordings
           </label>
 
           <label className="flex items-center gap-2">
-            <input
-              id="wd-student-annotation"
-              type="checkbox"
-            />
+            <input id="wd-student-annotation" type="checkbox" />
             Student Annotation
           </label>
 
           <label className="flex items-center gap-2">
-            <input
-              id="wd-file-upload"
-              type="checkbox"
-            />
+            <input id="wd-file-upload" type="checkbox" />
             File Upload
           </label>
         </div>
@@ -170,6 +145,7 @@ export default async function AssignmentEditor({
         <input
           id="wd-due-date"
           type="date"
+          defaultValue={assignment?.due}
           className={inputStyle}
         />
       </div>
@@ -181,6 +157,7 @@ export default async function AssignmentEditor({
         <input
           id="wd-available-from"
           type="date"
+          defaultValue={assignment?.available}
           className={inputStyle}
         />
       </div>
@@ -193,20 +170,6 @@ export default async function AssignmentEditor({
           id="wd-available-until"
           type="date"
           className={inputStyle}
-        />
-      </div>
-
-      <div className="mt-6">
-        <label
-          htmlFor="wd-ai-editor-notes"
-          className="mb-2 block font-medium"
-        >
-          Sample notes
-        </label>
-
-        <textarea
-          id="wd-ai-editor-notes"
-          className={`${inputStyle} min-h-[100px]`}
         />
       </div>
 

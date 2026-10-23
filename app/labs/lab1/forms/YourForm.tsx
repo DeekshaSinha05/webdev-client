@@ -30,12 +30,12 @@ export default function YourForm() {
       />
       <br />
 
-      <label htmlFor="wd-your-student-id">Password:</label>
+      <label htmlFor="wd-your-student-id">Student ID:</label>
       <br />
       <input
         id="wd-your-student-id"
         type="password"
-        defaultValue="123"
+        defaultValue="password123"
       />
 
       <h5>About Me</h5>

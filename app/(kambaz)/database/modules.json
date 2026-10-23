@@ -1,0 +1,243 @@
+
+[
+  {
+    "_id": "M101",
+    "name": "Introduction to Rocket Propulsion",
+    "description": "Introduction to rocket propulsion and rocket engines.",
+    "course": "RS101",
+    "lessons": [
+      {
+        "_id": "L101",
+        "name": "History of Rocketry",
+        "description": "The history of rockets and space exploration.",
+        "module": "M101"
+      },
+      {
+        "_id": "L102",
+        "name": "Rocket Propulsion Fundamentals",
+        "description": "Fundamental concepts of rocket propulsion.",
+        "module": "M101"
+      },
+      {
+        "_id": "L103",
+        "name": "Rocket Engine Types",
+        "description": "Different types of rocket engines.",
+        "module": "M101"
+      },
+      {
+        "_id": "L104",
+        "name": "Propulsion Safety Review",
+        "description": "Safety checks for propulsion systems.",
+        "module": "M101"
+      }
+    ]
+  },
+  {
+    "_id": "M102",
+    "name": "Fuel and Combustion",
+    "description": "Rocket fuels, combustion, and efficiency.",
+    "course": "RS101",
+    "lessons": [
+      {
+        "_id": "L201",
+        "name": "Rocket Fuel",
+        "description": "Different types of rocket fuels.",
+        "module": "M102"
+      },
+      {
+        "_id": "L202",
+        "name": "Combustion Processes",
+        "description": "Combustion processes and efficiency.",
+        "module": "M102"
+      },
+      {
+        "_id": "L203",
+        "name": "Combustion Instability",
+        "description": "Combustion instability and its prevention.",
+        "module": "M102"
+      },
+      {
+        "_id": "L204",
+        "name": "Nozzle Design",
+        "description": "How nozzle shape affects thrust.",
+        "module": "M102"
+      }
+    ]
+  },
+  {
+    "_id": "M103",
+    "name": "Nozzle Design",
+    "description": "Rocket nozzle design and performance.",
+    "course": "RS101",
+    "lessons": [
+      {
+        "_id": "L301",
+        "name": "Nozzle Types",
+        "description": "Different types of rocket nozzles.",
+        "module": "M103"
+      },
+      {
+        "_id": "L302",
+        "name": "Nozzle Performance",
+        "description": "Nozzle performance and efficiency.",
+        "module": "M103"
+      },
+      {
+        "_id": "L303",
+        "name": "Nozzle Optimization",
+        "description": "Optimizing rocket nozzle designs.",
+        "module": "M103"
+      }
+    ]
+  },
+  {
+    "_id": "M201",
+    "name": "Fundamentals of Aerodynamics",
+    "description": "Aerodynamics and fluid dynamics.",
+    "course": "RS102",
+    "lessons": [
+      {
+        "_id": "L401",
+        "name": "Introduction to Fluid Dynamics",
+        "description": "Fluid mechanics and flow principles.",
+        "module": "M201"
+      },
+      {
+        "_id": "L402",
+        "name": "Airfoil Theory",
+        "description": "Airfoil design and lift generation.",
+        "module": "M201"
+      },
+      {
+        "_id": "L403",
+        "name": "Drag and Lift Forces",
+        "description": "Forces acting on aircraft.",
+        "module": "M201"
+      }
+    ]
+  },
+  {
+    "_id": "M202",
+    "name": "Subsonic and Supersonic Flow",
+    "description": "Subsonic and supersonic airflow.",
+    "course": "RS102",
+    "lessons": [
+      {
+        "_id": "L404",
+        "name": "Subsonic Flow Analysis",
+        "description": "Principles of subsonic flow.",
+        "module": "M202"
+      },
+      {
+        "_id": "L405",
+        "name": "Supersonic Flow Analysis",
+        "description": "Shock waves and supersonic effects.",
+        "module": "M202"
+      },
+      {
+        "_id": "L406",
+        "name": "Transonic Flow",
+        "description": "Flow at speeds near the speed of sound.",
+        "module": "M202"
+      }
+    ]
+  },
+  {
+    "_id": "M203",
+    "name": "Aerodynamic Heating",
+    "description": "Heating and thermal protection.",
+    "course": "RS102",
+    "lessons": [
+      {
+        "_id": "L407",
+        "name": "Heat Transfer in Flight",
+        "description": "Aerodynamic heating during flight.",
+        "module": "M203"
+      },
+      {
+        "_id": "L408",
+        "name": "Thermal Protection Systems",
+        "description": "Heat shields and protective materials.",
+        "module": "M203"
+      }
+    ]
+  },
+  {
+    "_id": "M301",
+    "name": "Spacecraft Structural Design",
+    "description": "Spacecraft structures and materials.",
+    "course": "RS103",
+    "lessons": [
+      {
+        "_id": "L501",
+        "name": "Structural Materials",
+        "description": "Materials used in spacecraft.",
+        "module": "M301"
+      },
+      {
+        "_id": "L502",
+        "name": "Load Analysis",
+        "description": "Forces and stresses on spacecraft.",
+        "module": "M301"
+      },
+      {
+        "_id": "L503",
+        "name": "Structural Testing",
+        "description": "Testing spacecraft structures.",
+        "module": "M301"
+      }
+    ]
+  },
+  {
+    "_id": "M302",
+    "name": "Orbital Mechanics",
+    "description": "Orbital dynamics and mission planning.",
+    "course": "RS103",
+    "lessons": [
+      {
+        "_id": "L504",
+        "name": "Kepler's Laws",
+        "description": "Principles of orbital motion.",
+        "module": "M302"
+      },
+      {
+        "_id": "L505",
+        "name": "Orbital Transfers",
+        "description": "Orbit transfers and trajectories.",
+        "module": "M302"
+      },
+      {
+        "_id": "L506",
+        "name": "Mission Planning",
+        "description": "Planning spacecraft missions.",
+        "module": "M302"
+      }
+    ]
+  },
+  {
+    "_id": "M303",
+    "name": "Spacecraft Systems Engineering",
+    "description": "Spacecraft systems and subsystems.",
+    "course": "RS103",
+    "lessons": [
+      {
+        "_id": "L507",
+        "name": "Power Systems",
+        "description": "Spacecraft electrical power systems.",
+        "module": "M303"
+      },
+      {
+        "_id": "L508",
+        "name": "Communication Systems",
+        "description": "Spacecraft communication and telemetry.",
+        "module": "M303"
+      },
+      {
+        "_id": "L509",
+        "name": "Thermal Management",
+        "description": "Spacecraft temperature control.",
+        "module": "M303"
+      }
+    ]
+  }
+]
