@@ -1,39 +1,67 @@
 
-import Link from "next/link";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAccountContext, type User } from "../AccountContext";
 
 export default function Profile() {
   const inputStyle =
     "mb-3 w-full rounded border border-gray-300 px-4 py-3";
+  const [profile, setProfile] = useState<User | null>(null);
+  const { currentUser, setCurrentUser } = useAccountContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!currentUser) {
+      router.push("/account/signin");
+      return;
+    }
+    setProfile(currentUser);
+  }, [currentUser, router]);
+
+  const signout = () => {
+    setCurrentUser(null);
+    router.push("/account/signin");
+  };
+
+  if (!profile) return null;
 
   return (
     <div id="wd-profile-screen" className="mx-auto mt-10 w-full max-w-sm">
       <h3 className="mb-6 text-3xl font-bold">Profile</h3>
 
       <input
-        defaultValue="alice"
+        id="wd-username"
         placeholder="username"
         className={`wd-username ${inputStyle}`}
+        value={profile.username}
+        onChange={(e) => setProfile({ ...profile, username: e.target.value })}
       />
 
       <input
-        defaultValue="123"
+        id="wd-password"
         placeholder="password"
         type="password"
         className={`wd-password ${inputStyle}`}
+        value={profile.password}
+        onChange={(e) => setProfile({ ...profile, password: e.target.value })}
       />
 
       <input
-        defaultValue="Alice"
         placeholder="First Name"
         id="wd-firstname"
         className={inputStyle}
+        value={profile.firstName}
+        onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
       />
 
       <input
-        defaultValue="Wonderland"
         placeholder="Last Name"
         id="wd-lastname"
         className={inputStyle}
+        value={profile.lastName}
+        onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
       />
 
       <input
@@ -44,14 +72,16 @@ export default function Profile() {
       />
 
       <input
-        defaultValue="alice@wonderland"
         type="email"
         id="wd-email"
         className={inputStyle}
+        value={profile.email}
+        onChange={(e) => setProfile({ ...profile, email: e.target.value })}
       />
 
       <select
-        defaultValue="FACULTY"
+        value={profile.role}
+        onChange={(e) => setProfile({ ...profile, role: e.target.value })}
         id="wd-role"
         className={`${inputStyle} bg-white`}
       >
@@ -61,12 +91,14 @@ export default function Profile() {
         <option value="STUDENT">Student</option>
       </select>
 
-      <Link
-        href="/account/signin"
-        className="mt-2 block rounded bg-red-700 px-4 py-3 text-center text-white no-underline"
+      <button
+        type="button"
+        onClick={signout}
+        id="wd-signout-btn"
+        className="mt-2 block w-full rounded bg-red-700 px-4 py-3 text-center text-white no-underline"
       >
         Sign out
-      </Link>
+      </button>
     </div>
   );
 }

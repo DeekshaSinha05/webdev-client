@@ -1,16 +1,20 @@
+"use client";
 
 import { FaPlus, FaSearch } from "react-icons/fa";
+import { useParams, useRouter } from "next/navigation";
 import AssignmentItem from "./AssignmentItem";
-import * as db from "../../../database";
+import { useAssignmentsStore } from "../../../store/assignmentsStore";
+import { useAccountContext } from "../../../account/AccountContext";
 
-export default async function Assignments({
-  params,
-}: {
-  params: Promise<{ cid: string }>;
-}) {
-  const { cid } = await params;
-  const assignments = db.assignments.filter(
-    (assignment) => assignment.course === cid
+export default function Assignments() {
+  const { cid } = useParams();
+  const courseId = typeof cid === "string" ? cid : "";
+  const router = useRouter();
+  const { currentUser } = useAccountContext();
+  const canEdit = currentUser?.role === "FACULTY";
+  const assignments = useAssignmentsStore((state) => state.assignments);
+  const courseAssignments = assignments.filter(
+    (assignment) => assignment.course === courseId,
   );
 
   return (
@@ -35,14 +39,17 @@ export default async function Assignments({
             Group
           </button>
 
-          <button
-            id="wd-add-assignment"
-            type="button"
-            className="flex items-center gap-2 rounded bg-red-700 px-4 py-2 text-white"
-          >
-            <FaPlus />
-            Assignment
-          </button>
+          {canEdit && (
+            <button
+              id="wd-add-assignment"
+              type="button"
+              className="flex items-center gap-2 rounded bg-red-700 px-4 py-2 text-white"
+              onClick={() => router.push(`/courses/${courseId}/assignments/new`)}
+            >
+              <FaPlus />
+              Assignment
+            </button>
+          )}
         </div>
       </div>
 
@@ -53,22 +60,20 @@ export default async function Assignments({
         >
           <span>ASSIGNMENTS 40% of Total</span>
 
-          <button
-            type="button"
-            className="rounded px-2 py-1 text-xl"
-          >
+          <button type="button" className="rounded px-2 py-1 text-xl">
             <FaPlus />
           </button>
         </h3>
 
         <ul id="wd-assignment-list" className="m-0 list-none p-0">
-          {assignments.map((assignment) => (
+          {courseAssignments.map((assignment) => (
             <AssignmentItem
               key={assignment._id}
-              cid={cid}
+              cid={courseId}
               aid={assignment._id}
               title={assignment.title}
               details={`Multiple Modules | Not available until ${assignment.available} | Due ${assignment.due} | ${assignment.points} pts`}
+              canEdit={canEdit}
             />
           ))}
         </ul>

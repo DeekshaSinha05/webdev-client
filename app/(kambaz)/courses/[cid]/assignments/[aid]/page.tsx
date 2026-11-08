@@ -1,16 +1,92 @@
+"use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import * as db from "../../../../database";
+import { redirect, useParams, useRouter } from "next/navigation";
+import { useAssignmentsStore, type Assignment } from "../../../../store/assignmentsStore";
+import { useAccountContext } from "../../../../account/AccountContext";
 
-export default async function AssignmentEditor({
-  params,
-}: {
-  params: Promise<{ cid: string; aid: string }>;
-}) {
-  const { cid, aid } = await params;
-  const assignment = db.assignments.find(
-    (a) => a._id === aid && a.course === cid
+export default function AssignmentEditor() {
+  const { cid, aid } = useParams();
+  const courseId = typeof cid === "string" ? cid : "";
+  const assignmentId = typeof aid === "string" ? aid : "";
+  const { currentUser } = useAccountContext();
+  const canEdit = currentUser?.role === "FACULTY";
+  const assignments = useAssignmentsStore((state) => state.assignments);
+  const existing = assignments.find(
+    (assignment) => assignment._id === assignmentId && assignment.course === courseId,
   );
+  const isNew = assignmentId === "new";
+
+  if (isNew && !canEdit) {
+    redirect(`/courses/${courseId}/assignments`);
+  }
+
+  if (!isNew && !existing) {
+    return (
+      <div id="wd-assignments-editor" className="max-w-4xl">
+        <p>Assignment not found.</p>
+        <Link href={`/courses/${courseId}/assignments`}>Back to Assignments</Link>
+      </div>
+    );
+  }
+
+  const initialAssignment: Assignment = isNew
+    ? {
+        _id: "",
+        title: "",
+        course: courseId,
+        description: "",
+        points: 100,
+        due: "",
+        available: "",
+        until: "",
+      }
+    : { ...existing!, until: existing!.until ?? "" };
+
+  return (
+    <AssignmentForm
+      key={`${courseId}-${assignmentId}`}
+      cid={courseId}
+      aid={assignmentId}
+      initialAssignment={initialAssignment}
+      isNew={isNew}
+      canEdit={canEdit}
+    />
+  );
+}
+
+function AssignmentForm({
+  cid,
+  aid,
+  initialAssignment,
+  isNew,
+  canEdit,
+}: {
+  cid: string;
+  aid: string;
+  initialAssignment: Assignment;
+  isNew: boolean;
+  canEdit: boolean;
+}) {
+  const [assignment, setAssignment] = useState<Assignment>(initialAssignment);
+  const [pointsInput, setPointsInput] = useState(String(initialAssignment.points));
+  const addAssignment = useAssignmentsStore((state) => state.addAssignment);
+  const updateAssignment = useAssignmentsStore((state) => state.updateAssignment);
+  const router = useRouter();
+
+  const save = () => {
+    if (!canEdit || pointsInput.trim() === "") return;
+    const points = Number(pointsInput);
+    if (!Number.isFinite(points) || points < 0) return;
+    const savedAssignment = { ...assignment, course: cid, points };
+    if (isNew) {
+      addAssignment(savedAssignment);
+    } else {
+      updateAssignment({ ...savedAssignment, _id: initialAssignment._id });
+    }
+    router.push(`/courses/${cid}/assignments`);
+  };
 
   const inputStyle =
     "w-full rounded border border-gray-300 bg-white px-3 py-2";
@@ -26,12 +102,14 @@ export default async function AssignmentEditor({
         </label>
         <input
           id="wd-name"
-          defaultValue={assignment?.title ?? ""}
+          value={assignment.title}
+          onChange={(e) => setAssignment({ ...assignment, title: e.target.value })}
+          readOnly={!canEdit}
           className={inputStyle}
         />
       </div>
 
-      <p className="mb-4">Assignment id: {aid}</p>
+      {!isNew && <p className="mb-4">Assignment id: {aid}</p>}
 
       <div className="mb-6">
         <label htmlFor="wd-description" className="mb-2 block font-medium">
@@ -39,7 +117,11 @@ export default async function AssignmentEditor({
         </label>
         <textarea
           id="wd-description"
-          defaultValue={assignment?.description ?? ""}
+          value={assignment.description}
+          onChange={(e) =>
+            setAssignment({ ...assignment, description: e.target.value })
+          }
+          readOnly={!canEdit}
           className={`${inputStyle} min-h-[160px]`}
         />
       </div>
@@ -50,7 +132,11 @@ export default async function AssignmentEditor({
         </label>
         <input
           id="wd-points"
-          defaultValue={assignment?.points ?? 100}
+          type="number"
+          min="0"
+          value={pointsInput}
+          onChange={(e) => setPointsInput(e.target.value)}
+          readOnly={!canEdit}
           className={inputStyle}
         />
       </div>
@@ -63,6 +149,7 @@ export default async function AssignmentEditor({
           id="wd-group"
           defaultValue="ASSIGNMENTS"
           className={inputStyle}
+          disabled={!canEdit}
         >
           <option value="ASSIGNMENTS">ASSIGNMENTS</option>
           <option value="QUIZZES">QUIZZES</option>
@@ -79,6 +166,7 @@ export default async function AssignmentEditor({
           id="wd-display-grade-as"
           defaultValue="Percentage"
           className={inputStyle}
+          disabled={!canEdit}
         >
           <option value="Percentage">Percentage</option>
         </select>
@@ -92,6 +180,7 @@ export default async function AssignmentEditor({
           id="wd-submission-type"
           defaultValue="Online"
           className={inputStyle}
+          disabled={!canEdit}
         >
           <option value="Online">Online</option>
         </select>
@@ -101,27 +190,27 @@ export default async function AssignmentEditor({
         <span className={labelStyle}>Online Entry Options</span>
         <div className="flex flex-col gap-3 rounded border border-gray-300 p-4">
           <label className="flex items-center gap-2">
-            <input id="wd-text-entry" type="checkbox" defaultChecked />
+            <input id="wd-text-entry" type="checkbox" defaultChecked disabled={!canEdit} />
             Text Entry
           </label>
 
           <label className="flex items-center gap-2">
-            <input id="wd-website-url" type="checkbox" defaultChecked />
+            <input id="wd-website-url" type="checkbox" defaultChecked disabled={!canEdit} />
             Website URL
           </label>
 
           <label className="flex items-center gap-2">
-            <input id="wd-media-recordings" type="checkbox" />
+            <input id="wd-media-recordings" type="checkbox" disabled={!canEdit} />
             Media Recordings
           </label>
 
           <label className="flex items-center gap-2">
-            <input id="wd-student-annotation" type="checkbox" />
+            <input id="wd-student-annotation" type="checkbox" disabled={!canEdit} />
             Student Annotation
           </label>
 
           <label className="flex items-center gap-2">
-            <input id="wd-file-upload" type="checkbox" />
+            <input id="wd-file-upload" type="checkbox" disabled={!canEdit} />
             File Upload
           </label>
         </div>
@@ -135,6 +224,7 @@ export default async function AssignmentEditor({
           id="wd-assign-to"
           defaultValue="Everyone"
           className={inputStyle}
+          readOnly={!canEdit}
         />
       </div>
 
@@ -145,7 +235,9 @@ export default async function AssignmentEditor({
         <input
           id="wd-due-date"
           type="date"
-          defaultValue={assignment?.due}
+          value={assignment.due}
+          onChange={(e) => setAssignment({ ...assignment, due: e.target.value })}
+          readOnly={!canEdit}
           className={inputStyle}
         />
       </div>
@@ -157,7 +249,9 @@ export default async function AssignmentEditor({
         <input
           id="wd-available-from"
           type="date"
-          defaultValue={assignment?.available}
+          value={assignment.available}
+          onChange={(e) => setAssignment({ ...assignment, available: e.target.value })}
+          readOnly={!canEdit}
           className={inputStyle}
         />
       </div>
@@ -169,6 +263,9 @@ export default async function AssignmentEditor({
         <input
           id="wd-available-until"
           type="date"
+          value={assignment.until ?? ""}
+          onChange={(e) => setAssignment({ ...assignment, until: e.target.value })}
+          readOnly={!canEdit}
           className={inputStyle}
         />
       </div>
@@ -182,13 +279,16 @@ export default async function AssignmentEditor({
           Cancel
         </Link>
 
-        <Link
-          href={`/courses/${cid}/assignments`}
-          id="wd-save"
-          className="rounded bg-red-700 px-5 py-2 text-white no-underline"
-        >
-          Save
-        </Link>
+        {canEdit && (
+          <button
+            type="button"
+            onClick={save}
+            id="wd-save"
+            className="rounded bg-red-700 px-5 py-2 text-white no-underline"
+          >
+            Save
+          </button>
+        )}
       </div>
     </div>
   );
