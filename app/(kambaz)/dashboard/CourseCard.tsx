@@ -29,6 +29,11 @@ export default function CourseCard({
       <Link
         href={`/courses/${course._id}/home`}
         className="wd-dashboard-course-link block text-neutral-900 no-underline"
+        onClick={(event) => {
+          if (!currentUser) {
+            event.preventDefault();
+          }
+        }}
       >
         <Image
           src={course.image}

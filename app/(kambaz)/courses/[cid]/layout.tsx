@@ -1,3 +1,4 @@
+
 "use client";
 
 import { ReactNode, useEffect, useState } from "react";
@@ -22,10 +23,11 @@ export default function CoursesLayout({
   const [showCourseNav, setShowCourseNav] = useState(true);
   const { currentUser } = useAccountContext();
   const enrollments = useEnrollmentsStore((state) => state.enrollments);
-  const hasAccess = !!currentUser && !!course && enrollments.some(
+
+  const hasAccess = !!course && (!currentUser || enrollments.some(
     (enrollment) =>
       enrollment.user === currentUser._id && enrollment.course === courseId,
-  );
+  ));
 
   useEffect(() => {
     if (!hasAccess) {
@@ -46,13 +48,16 @@ export default function CoursesLayout({
         <Breadcrumb course={course} />
         <span className="ms-2 text-sm">({course?._id})</span>
       </h2>
+
       <hr className="border-gray-300" />
+
       <div className="mt-4 flex gap-4">
         {showCourseNav ? (
           <div className="hidden w-[140px] shrink-0 md:block">
             <CourseNavigation cid={courseId} />
           </div>
         ) : null}
+
         <div className="min-w-0 flex-1">{children}</div>
       </div>
     </div>
