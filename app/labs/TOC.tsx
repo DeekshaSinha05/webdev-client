@@ -60,6 +60,18 @@ const LINKS = [
     label: "Book Ch3",
     match: () => false,
   },
+  {
+    href: "https://github.com/DeekshaSinha05/webdev-server",
+    id: "wd-server-github",
+    label: "Server GitHub",
+    match: () => false,
+  },
+  {
+    href: "https://webdev-server-rit6.onrender.com",
+    id: "wd-server-url",
+    label: "Server",
+    match: () => false,
+  },
 ] as const;
 
 const activeStyle = {
