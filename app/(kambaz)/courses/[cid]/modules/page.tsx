@@ -2,6 +2,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 import Module from "./Module";
 import ModulesControls from "./ModulesControls";
 import { useModulesStore } from "../../../store/modulesStore";
@@ -9,6 +10,8 @@ import { useModulesStore } from "../../../store/modulesStore";
 export default function Modules() {
   const { cid } = useParams();
   const modules = useModulesStore((state) => state.modules);
+  const loadModules = useModulesStore(state => state.loadModules);
+  useEffect(() => { if (typeof cid === "string") loadModules(cid); }, [cid, loadModules]);
   const courseModules = modules.filter((module) => module.course === cid);
 
   return (

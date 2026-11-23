@@ -1,6 +1,7 @@
 "use client";
 
 import { FaPlus, FaSearch } from "react-icons/fa";
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import AssignmentItem from "./AssignmentItem";
 import { useAssignmentsStore } from "../../../store/assignmentsStore";
@@ -13,6 +14,8 @@ export default function Assignments() {
   const { currentUser } = useAccountContext();
   const canEdit = currentUser?.role === "FACULTY";
   const assignments = useAssignmentsStore((state) => state.assignments);
+  const loadAssignments = useAssignmentsStore(state => state.loadAssignments);
+  useEffect(() => { if (courseId) loadAssignments(courseId); }, [courseId, loadAssignments]);
   const courseAssignments = assignments.filter(
     (assignment) => assignment.course === courseId,
   );

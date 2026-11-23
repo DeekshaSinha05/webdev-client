@@ -3,6 +3,7 @@
 
 import { create } from "zustand";
 import coursesJson from "../database/courses.json";
+import * as client from "../courses/client";
 
 export type Course = (typeof coursesJson)[number];
 
@@ -21,28 +22,44 @@ const emptyCourse: Course = {
 
 type CoursesStore = {
   courses: Course[];
-  addCourse: (course: Course) => void;
-  deleteCourse: (courseId: string) => void;
-  updateCourse: (course: Course) => void;
+  loadCourses: () => Promise<void>;
+  addCourse: (course: Course) => Promise<void>;
+  deleteCourse: (courseId: string) => Promise<void>;
+  updateCourse: (course: Course) => Promise<void>;
 };
 
 export const useCoursesStore = create<CoursesStore>((set) => ({
   courses: coursesJson,
-  addCourse: (course) =>
+
+  loadCourses: async () => {
+    const courses = await client.findAllCourses();
+    set({ courses });
+  },
+
+  addCourse: async (course) => {
+    const created = await client.createCourse(course);
     set((state) => ({
-      courses: [
-        ...state.courses,
-        { ...emptyCourse, ...course, _id: crypto.randomUUID() },
-      ],
-    })),
-  deleteCourse: (courseId) =>
+      courses: [...state.courses, created],
+    }));
+  },
+
+  deleteCourse: async (courseId) => {
+    await client.deleteCourse(courseId);
     set((state) => ({
-      courses: state.courses.filter((course) => course._id !== courseId),
-    })),
-  updateCourse: (course) =>
+      courses: state.courses.filter(
+        (c) => c._id !== courseId
+      ),
+    }));
+  },
+
+  updateCourse: async (course) => {
+    const updated = await client.updateCourse(course);
     set((state) => ({
-      courses: state.courses.map((c) => (c._id === course._id ? course : c)),
-    })),
+      courses: state.courses.map((c) =>
+        c._id === updated._id ? updated : c
+      ),
+    }));
+  },
 }));
 
 export { emptyCourse };

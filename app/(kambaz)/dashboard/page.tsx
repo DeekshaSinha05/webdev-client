@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CourseCard from "./CourseCard";
 import { useAccountContext } from "../account/AccountContext";
 import { useEnrollmentsStore } from "../store/enrollmentsStore";
@@ -13,37 +13,75 @@ import {
 
 export default function Dashboard() {
   const courses = useCoursesStore((state) => state.courses);
-  const addCourse = useCoursesStore((state) => state.addCourse);
-  const updateCourse = useCoursesStore((state) => state.updateCourse);
+  const loadCourses = useCoursesStore(
+    (state) => state.loadCourses
+  );
+  const loadEnrollments = useEnrollmentsStore(
+    (state) => state.loadEnrollments
+  );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    Promise.all([loadCourses(), loadEnrollments()])
+      .catch(console.error)
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [loadCourses, loadEnrollments]);
+
+  const addCourse = useCoursesStore(
+    (state) => state.addCourse
+  );
+  const updateCourse = useCoursesStore(
+    (state) => state.updateCourse
+  );
   const [course, setCourse] = useState<Course>(emptyCourse);
   const { currentUser } = useAccountContext();
-  const enrollments = useEnrollmentsStore((state) => state.enrollments);
+  const enrollments = useEnrollmentsStore(
+    (state) => state.enrollments
+  );
   const [showAllCourses, setShowAllCourses] = useState(false);
-  const visibleCourses = showAllCourses || !currentUser
-    ? courses
-    : courses.filter((c) =>
-        enrollments.some(
-          (enrollment) =>
-            enrollment.user === currentUser._id && enrollment.course === c._id,
-        ),
-      );
+
+  const visibleCourses =
+    showAllCourses || !currentUser
+      ? courses
+      : courses.filter((c) =>
+          enrollments.some(
+            (enrollment) =>
+              enrollment.user === currentUser._id &&
+              enrollment.course === c._id
+          )
+        );
 
   return (
     <div id="wd-dashboard" className="flex-1 p-6">
       <div className="flex items-center justify-between">
-        <h1 id="wd-dashboard-title" className="mb-4 text-3xl font-bold">
+        <h1
+          id="wd-dashboard-title"
+          className="mb-4 text-3xl font-bold"
+        >
           Dashboard
         </h1>
         <button
           type="button"
           id="wd-enrollments-toggle"
           className="rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white"
-          onClick={() => setShowAllCourses(!showAllCourses)}
+          onClick={() =>
+            setShowAllCourses(!showAllCourses)
+          }
         >
           Enrollments
         </button>
       </div>
+
       <hr className="border-gray-300" />
+
       <h5 className="flex flex-wrap items-center gap-2">
         New Course
         <button
@@ -63,53 +101,75 @@ export default function Dashboard() {
           Update
         </button>
       </h5>
+
       <input
         className="mb-2 mt-2 block w-full max-w-xl rounded border border-neutral-300 px-3 py-1.5"
         value={course.name}
-        onChange={(e) => setCourse({ ...course, name: e.target.value })}
+        onChange={(e) =>
+          setCourse({ ...course, name: e.target.value })
+        }
         id="wd-course-name"
       />
+
       <textarea
         className="mb-3 block w-full max-w-xl rounded border border-neutral-300 px-3 py-1.5"
         rows={3}
         value={course.description}
         onChange={(e) =>
-          setCourse({ ...course, description: e.target.value })
+          setCourse({
+            ...course,
+            description: e.target.value,
+          })
         }
         id="wd-course-description"
       />
+
       <input
         className="mb-2 mt-2 block w-full max-w-xl rounded border border-neutral-300 px-3 py-1.5"
         value={course.number}
-        onChange={(e) => setCourse({ ...course, number: e.target.value })}
+        onChange={(e) =>
+          setCourse({ ...course, number: e.target.value })
+        }
         id="wd-course-number"
       />
+
       <input
         type="date"
         className="mb-2 mt-2 block w-full max-w-xl rounded border border-neutral-300 px-3 py-1.5"
         value={course.startDate}
-        onChange={(e) => setCourse({ ...course, startDate: e.target.value })}
+        onChange={(e) =>
+          setCourse({
+            ...course,
+            startDate: e.target.value,
+          })
+        }
         id="wd-course-start-date"
       />
+
       <hr className="border-gray-300" />
+
       <h2
         id="wd-dashboard-published"
         className="my-4 text-2xl font-bold"
       >
-        Published Courses ({visibleCourses.length})
+        Published Courses (
+        {loading ? "..." : visibleCourses.length})
       </h2>
+
       <hr className="border-gray-300" />
+
       <div
         id="wd-dashboard-courses"
         className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
       >
-        {visibleCourses.map((c) => (
-          <CourseCard
-            key={c._id}
-            course={c}
-            onEdit={() => setCourse(c)}
-          />
-        ))}
+        {!loading &&
+          visibleCourses.map((c) => (
+            <CourseCard
+              key={c._id}
+              course={c}
+              onEdit={() => setCourse(c)}
+            />
+          ))}
       </div>
     </div>
   );

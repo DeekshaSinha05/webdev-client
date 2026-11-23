@@ -1,7 +1,9 @@
+
 "use client";
 
 import { create } from "zustand";
 import modulesJson from "../database/modules.json";
+import * as client from "../courses/client";
 
 export type Lesson = {
   _id: string;
@@ -21,39 +23,63 @@ export type CourseModule = {
 
 type ModulesStore = {
   modules: CourseModule[];
-  addModule: (module: { name: string; course: string }) => void;
-  deleteModule: (moduleId: string) => void;
-  updateModule: (module: CourseModule) => void;
+  loadModules: (courseId: string) => Promise<void>;
+  addModule: (module: {
+    name: string;
+    course: string;
+  }) => Promise<void>;
+  deleteModule: (moduleId: string) => Promise<void>;
+  updateModule: (module: CourseModule) => Promise<void>;
   editModule: (moduleId: string) => void;
 };
 
 export const useModulesStore = create<ModulesStore>((set) => ({
   modules: modulesJson as CourseModule[],
-  addModule: (module) =>
+
+  loadModules: async (courseId) => {
+    const loaded = await client.findModulesForCourse(courseId);
     set((state) => ({
       modules: [
-        ...state.modules,
-        {
-          _id: crypto.randomUUID(),
-          name: module.name,
-          description: "",
-          course: module.course,
-          lessons: [],
-        },
+        ...state.modules.filter((m) => m.course !== courseId),
+        ...loaded,
       ],
-    })),
-  deleteModule: (moduleId) =>
+    }));
+  },
+
+  addModule: async (module) => {
+    const created = await client.createModuleForCourse(
+      module.course,
+      { ...module, description: "", lessons: [] }
+    );
     set((state) => ({
-      modules: state.modules.filter((m) => m._id !== moduleId),
-    })),
-  updateModule: (module) =>
+      modules: [...state.modules, created],
+    }));
+  },
+
+  deleteModule: async (moduleId) => {
+    await client.deleteModule(moduleId);
     set((state) => ({
-      modules: state.modules.map((m) => (m._id === module._id ? module : m)),
-    })),
+      modules: state.modules.filter(
+        (m) => m._id !== moduleId
+      ),
+    }));
+  },
+
+  updateModule: async (module) => {
+    const updated = await client.updateModule(module);
+    set((state) => ({
+      modules: state.modules.map((m) =>
+        m._id === module._id ? updated : m
+      ),
+    }));
+  },
+
   editModule: (moduleId) =>
     set((state) => ({
       modules: state.modules.map((m) =>
-        m._id === moduleId ? { ...m, editing: true } : m,
+        m._id === moduleId
+          ? { ...m, editing: true }
+          : m
       ),
     })),
 }));

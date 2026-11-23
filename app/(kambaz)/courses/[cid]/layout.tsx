@@ -1,7 +1,11 @@
 
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import {
+  type ReactNode,
+  useEffect,
+  useState,
+} from "react";
 import { useParams, useRouter } from "next/navigation";
 import { FaAlignJustify } from "react-icons/fa6";
 import CourseNavigation from "./Navigation";
@@ -18,35 +22,88 @@ export default function CoursesLayout({
   const { cid } = useParams();
   const router = useRouter();
   const courseId = typeof cid === "string" ? cid : "";
-  const courses = useCoursesStore((state) => state.courses);
-  const course = courses.find((c) => c._id === courseId);
-  const [showCourseNav, setShowCourseNav] = useState(true);
-  const { currentUser } = useAccountContext();
-  const enrollments = useEnrollmentsStore((state) => state.enrollments);
 
-  const hasAccess = !!course && (!currentUser || enrollments.some(
-    (enrollment) =>
-      enrollment.user === currentUser._id && enrollment.course === courseId,
-  ));
+  const courses = useCoursesStore(
+    (state) => state.courses
+  );
+  const loadCourses = useCoursesStore(
+    (state) => state.loadCourses
+  );
+  const loadEnrollments = useEnrollmentsStore(
+    (state) => state.loadEnrollments
+  );
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!hasAccess) {
+    let active = true;
+
+    Promise.all([loadCourses(), loadEnrollments()])
+      .catch(console.error)
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [loadCourses, loadEnrollments]);
+
+  const course = courses.find(
+    (c) => c._id === courseId
+  );
+  const [showCourseNav, setShowCourseNav] =
+    useState(true);
+
+  const { currentUser, authLoading } =
+    useAccountContext();
+
+  const enrollments = useEnrollmentsStore(
+    (state) => state.enrollments
+  );
+
+  const hasAccess =
+    !!course &&
+    (!currentUser ||
+      enrollments.some(
+        (enrollment) =>
+          enrollment.user === currentUser._id &&
+          enrollment.course === courseId
+      ));
+
+  useEffect(() => {
+    if (
+      !loading &&
+      !authLoading &&
+      !hasAccess
+    ) {
       router.replace("/dashboard");
     }
-  }, [hasAccess, router]);
+  }, [
+    hasAccess,
+    router,
+    loading,
+    authLoading,
+  ]);
 
-  if (!hasAccess) return null;
+  if (loading || authLoading || !hasAccess) {
+    return null;
+  }
 
   return (
     <div id="wd-courses" className="flex-1 p-6">
       <h2 className="mb-4 text-2xl font-semibold text-red-600">
         <FaAlignJustify
           className="me-4 mb-1 inline cursor-pointer text-xl"
-          onClick={() => setShowCourseNav(!showCourseNav)}
+          onClick={() =>
+            setShowCourseNav(!showCourseNav)
+          }
           title="Toggle course navigation"
         />
         <Breadcrumb course={course} />
-        <span className="ms-2 text-sm">({course?._id})</span>
+        <span className="ms-2 text-sm">
+          ({course?._id})
+        </span>
       </h2>
 
       <hr className="border-gray-300" />
@@ -58,7 +115,9 @@ export default function CoursesLayout({
           </div>
         ) : null}
 
-        <div className="min-w-0 flex-1">{children}</div>
+        <div className="min-w-0 flex-1">
+          {children}
+        </div>
       </div>
     </div>
   );
